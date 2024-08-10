@@ -59,13 +59,17 @@ app.post('/analyze', (req, res) => {
     const pythonScript = path.join(__dirname, 'analyze_code.py');
     exec(`python3 ${pythonScript} ${codeFile}`, (err, stdout, stderr) => {
         if (err) {
+            console.error('Python script execution error:', stderr);  // Log the error details
             return res.status(500).json({ error: 'Analysis error', details: stderr });
         }
 
+        console.log('Python script output:', stdout);  // Log the output for debugging
         res.json({ analysis: stdout });
     });
 });
-const PORT = 4000;
+
+// Start the server
+const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
     console.log(`Compiler server is running on http://localhost:${PORT}`);
 });
