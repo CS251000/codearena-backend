@@ -53,9 +53,11 @@ app.post('/analyze', (req, res) => {
         return res.status(400).json({ error: 'No code provided' });
     }
 
-    const pythonScript = path.join(__dirname, 'analyze_code.py');
+    const codeFile = path.join(WORK_DIR, 'code.cpp');
+    fs.writeFileSync(codeFile, code);
 
-    exec(`python3 ${pythonScript} "${code.replace(/"/g, '\\"')}"`, (err, stdout, stderr) => {
+    const pythonScript = path.join(__dirname, 'analyze_code.py');
+    exec(`python3 ${pythonScript} ${codeFile}`, (err, stdout, stderr) => {
         if (err) {
             return res.status(500).json({ error: 'Analysis error', details: stderr });
         }
@@ -64,8 +66,3 @@ app.post('/analyze', (req, res) => {
     });
 });
 
-// Start the server
-const PORT = 4000;
-app.listen(PORT, () => {
-    console.log(`Compiler server is running on http://localhost:${PORT}`);
-});

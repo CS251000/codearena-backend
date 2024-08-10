@@ -2,7 +2,6 @@ import os
 import google.generativeai as genai
 import sys
 
-
 genai.configure(api_key='AIzaSyCLY3okKHz7qZUfW-Q8Q0GDjsvwmnIYaKs')
 
 model = genai.GenerativeModel('gemini-pro')
@@ -23,6 +22,8 @@ def analyze_code(code):
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
-        code = sys.argv[1]
+        code_file = sys.argv[1]
+        with open(code_file, 'r') as f:
+            code = f.read()
         analysis = analyze_code(code)
         print(analysis)
