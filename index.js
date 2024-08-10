@@ -18,13 +18,13 @@ if (!fs.existsSync(WORK_DIR)) {
 
 // Compile and run C++ code
 app.post('/run', (req, res) => {
-    const { code } = req.body;
+    const { code, expectedOutput } = req.body;
     if (!code) {
         return res.status(400).json({ error: 'No code provided' });
     }
 
-    const filename = path.join(WORK_DIR, `temp.cpp`);
-    const outputFilename = path.join(WORK_DIR, `output`);
+    const filename = path.join(WORK_DIR, 'temp.cpp');
+    const outputFilename = path.join(WORK_DIR, 'output');
 
     fs.writeFileSync(filename, code);
 
@@ -41,7 +41,14 @@ app.post('/run', (req, res) => {
                 return res.status(500).json({ error: 'Runtime error', details: stderr });
             }
 
-            res.json({ output: stdout });
+            const actualOutput = stdout;
+            const isMatch = actualOutput.trim() === expectedOutput.trim();
+
+            res.json({
+                output: actualOutput,
+                match: isMatch,
+                expectedOutput
+            });
         });
     });
 });
@@ -53,17 +60,13 @@ app.post('/analyze', (req, res) => {
         return res.status(400).json({ error: 'No code provided' });
     }
 
-    const codeFile = path.join(WORK_DIR, 'code.cpp');
-    fs.writeFileSync(codeFile, code);
-
     const pythonScript = path.join(__dirname, 'analyze_code.py');
-    exec(`python3 ${pythonScript} ${codeFile}`, (err, stdout, stderr) => {
+
+    exec(`python3 ${pythonScript} "${code.replace(/"/g, '\\"')}"`, (err, stdout, stderr) => {
         if (err) {
-            console.error('Python script execution error:', stderr);  // Log the error details
             return res.status(500).json({ error: 'Analysis error', details: stderr });
         }
 
-        console.log('Python script output:', stdout);  // Log the output for debugging
         res.json({ analysis: stdout });
     });
 });
