@@ -65,4 +65,7 @@ app.post('/analyze', (req, res) => {
         res.json({ analysis: stdout });
     });
 });
-
+const PORT = 4000;
+app.listen(PORT, () => {
+    console.log(`Compiler server is running on http://localhost:${PORT}`);
+});
