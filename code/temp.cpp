@@ -1,5 +1,5 @@
 #include<iostream>
 using namespace std;
 int main(){
-    cout<<jrine;
+    cout<<"sndc ";
 }

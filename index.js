@@ -42,7 +42,7 @@ app.post('/run', (req, res) => {
             }
 
             const actualOutput = stdout;
-            const isMatch = actualOutput.trim() === expectedOutput.trim();
+            const isMatch = actualOutput === expectedOutput;
 
             res.json({
                 output: actualOutput,
@@ -61,8 +61,9 @@ app.post('/analyze', (req, res) => {
     }
 
     const pythonScript = path.join(__dirname, 'analyze_code.py');
+    const encodedCode = encodeURIComponent(code.replace(/"/g, '\\"').replace(/\n/g, "\\n"));
 
-    exec(`python3 ${pythonScript} "${code.replace(/"/g, '\\"')}"`, (err, stdout, stderr) => {
+    exec(`python3 ${pythonScript} "${encodedCode}"`, (err, stdout, stderr) => {
         if (err) {
             return res.status(500).json({ error: 'Analysis error', details: stderr });
         }
@@ -71,8 +72,9 @@ app.post('/analyze', (req, res) => {
     });
 });
 
+
 // Start the server
-const PORT = process.env.PORT || 4000;
+const PORT = 4000;
 app.listen(PORT, () => {
     console.log(`Compiler server is running on http://localhost:${PORT}`);
 });
